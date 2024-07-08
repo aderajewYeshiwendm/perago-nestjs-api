@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Photo } from '../entities/photo.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 
 @Injectable()
 export class PhotoService {
     constructor(
-        @InjectRepository(Photo)
-        private readonly photoRepository: Repository<Photo>,
+        @InjectEntityManager()
+        private readonly entityManager: EntityManager,
     ) { }
     
     async createPhoto(userId:string,dto: CreatePhotoDto,): Promise<Photo> {
-        const photo = this.photoRepository.create({
+        const photo = this.entityManager.create(Photo,{
+            
             userId,
             ...dto,
         })
       
-            return this.photoRepository.save(photo);
+            return this.entityManager.save(Photo,photo);
     
     }
 }

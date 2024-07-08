@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
@@ -9,8 +9,8 @@ import { User } from '../entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
     private readonly jwt: JwtService
   ) {}
 
@@ -22,7 +22,7 @@ export class AuthService {
     user.password = hashedPassword;
 
     try {
-      await this.userRepository.save(user);
+      await this.entityManager.save(User, user);
       return this.Token(user.id, user.email);
     } catch (error) {
       if (error.code === '23505') { // 23505 is the error code for unique violation in PostgreSQL
@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   async login(dto: AuthDto) {
-    const user = await this.userRepository.findOne({
+    const user = await this.entityManager.findOne(User,{
       where: { email: dto.email },
     });
 
