@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { Position } from '../entities/position.entity';
@@ -68,7 +68,7 @@ export class PositionService {
     }
 
     if (position.parentId !== parId) {
-      return 'not allowed to delete position of an employee';
+      return 'You are not allowed to delete position of an employee';
     } else {
       await this.entityManager.delete(Position, id);
     }
